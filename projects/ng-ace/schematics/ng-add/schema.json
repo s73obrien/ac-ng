@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsNgAce",
+  "title": "Schema for ng-ace schematic options",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project to convert",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "baseHref": {
+      "type": "string",
+      "description": "The base href under which your application can be accessed (default = 'app')",
+      "default": "app"
+    }
+   }
+}
