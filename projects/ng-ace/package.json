@@ -11,5 +11,8 @@
     "sequelize": "^5.12.2",
     "sqlite3": "^4.0.9"
   },
-  "schematics": "./schematics/collection.json"
+  "schematics": "./schematics/collection.json",
+  "devDependencies": {
+    "@types/xmldom": "^0.1.29"
+  }
 }

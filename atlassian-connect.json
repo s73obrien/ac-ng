@@ -1,0 +1,53 @@
+{
+  "key": "ng-ace-test",
+  "name": "My app",
+  "description": "My very first app",
+  "vendor": {
+      "name": "Angry Nerds",
+      "url": "https://www.atlassian.com/angrynerds"
+  },
+  "baseUrl": "{{localBaseUrl}}",
+  "links": {
+      "self": "{{localBaseUrl}}/atlassian-connect.json",
+      "homepage": "{{localBaseUrl}}/atlassian-connect.json"
+  },
+  "authentication": {
+      "type": "jwt"
+  },
+  "lifecycle": {
+      "installed": "/installed"
+  },
+  "scopes": [
+      "READ",
+      "WRITE"
+  ],
+  "modules": {
+      "generalPages": [
+          {
+              "key": "hello-world-page-jira",
+              "location": "system.top.navigation.bar",
+              "name": {
+                  "value": "NgAce Test App"
+              },
+              "url": "/app/",
+              "conditions": [{
+                  "condition": "user_is_logged_in"
+              }]
+          },
+          {
+              "key": "hello-world-page-confluence",
+              "location": "system.header/left",
+              "name": {
+                  "value": "Hello World"
+              },
+              "url": "/app/",
+              "conditions": [{
+                  "condition": "user_is_logged_in"
+              }]
+          }
+      ]
+  },
+  "apiMigrations": {
+      "gdpr": true
+  }
+}

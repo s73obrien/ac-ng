@@ -9,14 +9,18 @@ import {
   mergeWith,
   template
 } from '@angular-devkit/schematics';
+import { NodeDependency, NodeDependencyType, addPackageJsonDependency } from '@schematics/angular/utility/dependencies';
+
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { experimental, strings } from '@angular-devkit/core';
 import { Schema as NgAceOptions } from './schema';
+import { DEPENDENCIES } from './dependencies';
+import { pairs } from 'rxjs';
+import { map, concatMap } from 'rxjs/operators';
+import { JSDOM } from 'jsdom';
 
 export function ngAdd(options: NgAceOptions): Rule {
   return (tree: Tree, context: SchematicContext) => {
-    context.addTask(new NodePackageInstallTask());
-
     const workspaceConfig = tree.read('/angular.json');
     if (!workspaceConfig) {
       throw new SchematicsException('Could not find Angular workspace configuration');
@@ -31,6 +35,10 @@ export function ngAdd(options: NgAceOptions): Rule {
 
     if (!project.architect) {
       throw new SchematicsException('No architect entry found');
+    }
+
+    if (project.projectType !== 'application') {
+      throw new SchematicsException('ng-ace is intended only for use with applications');
     }
 
     // tslint:disable-next-line: no-string-literal
@@ -50,6 +58,10 @@ export function ngAdd(options: NgAceOptions): Rule {
         path: './webpack.config.js'
       }
     };
+
+    if (!build.options.index) {
+      throw new SchematicsException('Could not find index.html entry in angular.json');
+    }
 
     if (!serve) {
       throw new SchematicsException('Could not find serve command options');
@@ -73,27 +85,78 @@ export function ngAdd(options: NgAceOptions): Rule {
 
     tree.overwrite('/angular.json', JSON.stringify(workspace, undefined, 2));
 
-    const packageContent = tree.read('/package.json');
-    if (!packageContent) {
-      throw new SchematicsException('No package.json found');
-    }
-
-    const packageObject = JSON.parse(packageContent.toString());
-    packageObject.dependencies = {
-      ...packageObject.dependencies,
-      '@angular-builders/custom-webpack': '^8.1.0',
-      '@angular/common': '^8.0.0',
-      '@angular/core': '^8.0.0',
-      '@atlaskit/css-reset': '^5.0.5',
-      '@atlaskit/reduced-ui-pack': '^12.0.3',
-      'atlassian-connect-express': '^3.5.1',
-      'sequelize': '^5.12.2',
-      'sqlite3': '^4.0.9'
-    };
-
-    
     return chain([
+      modifyIndexHtml(options.baseHref as string, build.options.index),
+      addPackageJsonDependencies(),
+      installDependencies(),
       mergeWith(templateSource)
     ]);
+  };
+}
+
+function installDependencies(): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    context.addTask(new NodePackageInstallTask());
+    context.logger.debug('Dependencies installed');
+  };
+}
+
+function modifyIndexHtml(baseHref: string, indexLocation: string): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    if (!indexLocation) {
+      throw new SchematicsException('No index.html file found');
+    }
+    const indexHtmlBuffer = tree.read(indexLocation);
+    if (!indexHtmlBuffer) {
+      throw new SchematicsException(`Could not load ${indexLocation} from disk`);
+    }
+
+    const indexHtml = indexHtmlBuffer.toString();
+    const jsdom = new JSDOM(indexHtml, {
+      contentType: 'text/html'
+    });
+    const document = jsdom.window.document;
+
+    let scriptEl =
+      document.querySelector('script[src="https://connect-cdn.atl-paas.net/all.js"]') ||
+      document.querySelector('script[src="https://connect-cdn.atl-paas.net/all-debug.js"]');
+
+    if (!scriptEl) {
+      scriptEl = document.createElement('script');
+      scriptEl.setAttribute('src', 'https://connect-cdn.atl-paas.net/all-debug.js');
+      scriptEl.setAttribute('data-options', 'sizeToParent:true');
+      document.head.appendChild(scriptEl);
+    }
+
+    // let baseHrefEl = document.head.querySelector('base[href]');
+    // if (!baseHrefEl) {
+    //   context.logger.info('New base element created');
+    //   baseHrefEl = document.createElement('base');
+    //   document.head.appendChild(baseHrefEl);
+    // }
+    // baseHrefEl.setAttribute('href', `${baseHref}`);
+    // context.logger.info(`Base href set to ${baseHref} in ${indexLocation}`);
+
+    tree.overwrite(indexLocation, jsdom.serialize());
+    return tree;
+  };
+}
+
+function addPackageJsonDependencies(): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    return pairs(DEPENDENCIES).pipe(
+      concatMap(([key, obj]) => pairs<string>(obj)),
+      map(([name, version]) => {
+        const dependency: NodeDependency = {
+          type: NodeDependencyType.Dev,
+          name,
+          version,
+          overwrite: false
+        };
+        addPackageJsonDependency(tree, dependency);
+        context.logger.info(`Added dependency ${name} => ${version}`);
+        return tree;
+      })
+    );
   };
 }

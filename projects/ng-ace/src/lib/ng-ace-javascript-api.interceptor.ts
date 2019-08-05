@@ -39,8 +39,7 @@ export default class NgAceJavascriptApiInterceptor implements HttpInterceptor {
           status: e.xhr.status,
           statusText: e.xhr.statusText
         })),
-        zoneAware(this.zone),
-        tap(r => console.log(r)),
+        zoneAware(this.zone)
       );
     } else {
       return next.handle(req);

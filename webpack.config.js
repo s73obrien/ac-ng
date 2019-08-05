@@ -12,11 +12,14 @@ var configuration = config(configOpts);
 
 module.exports = {
   devServer: {
-    publicPath: <%= `'/${baseHref}/'` %>,
+    publicPath: '/app/',
     port: configuration.port(),
     disableHostCheck: true,
-    before: function (app, server) {
-      const addon = ace(app);
+    before: (app, server) => {
+      app.get('/', (req, res) => {
+        res.redirect('/atlassian-connect.json');
+      });
+
       app.set('port', configuration.port());
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({extended: false}));
@@ -25,10 +28,8 @@ module.exports = {
       if (app.get('env') == 'development') {
         app.use(errorHandler());
       }
-      app.get('/', (req, res) => {
-        res.redirect('/atlassian-connect.json');
-      });
 
+      const addon = ace(app);
       app.use(addon.middleware());
       (async () => {
         addon.register();

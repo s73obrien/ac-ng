@@ -13,6 +13,15 @@
         "add",
         "ng-ace"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Serve",
+      "program": "${workspaceFolder}\\node_modules\\@angular\\cli\\bin\\ng",
+      "args": [
+        "serve"
+      ]
     }
   ]
 }

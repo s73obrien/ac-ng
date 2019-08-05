@@ -5,12 +5,22 @@ const { parse } = require('url');
 const { fork } = require('child_process');
 const { resolve } = require('path');
 const tmp = require('tmp');
+const https = require('https');
 
 tmp.file({}, (err, path, fd) => {
+  const proxyInfo = process.env.http_proxy ||
+    process.env.https_proxy ||
+    process.env.HTTP_PROXY ||
+    process.env.HTTPS_PROXY;
+
+  const agent = proxyInfo ?
+    new HttpsProxyAgent(proxyInfo) :
+    new https.Agent();
+
   const file = createWriteStream('', { fd });
   const request = get({
     ...parse('https://developer.atlassian.com/cloud/jira/platform/swagger.v3.json'),
-    agent: new HttpsProxyAgent(process.env.http_proxy)
+    agent
   }, r => {
     r.pipe(file);
     console.log(path);
