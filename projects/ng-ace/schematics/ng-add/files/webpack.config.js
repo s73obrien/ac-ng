@@ -12,7 +12,7 @@ var configuration = config(configOpts);
 
 module.exports = {
   devServer: {
-    publicPath: <%= `'/${baseHref}/'` %>,
+    publicPath: "/",
     port: configuration.port(),
     disableHostCheck: true,
     before: function (app, server) {
@@ -25,9 +25,6 @@ module.exports = {
       if (app.get('env') == 'development') {
         app.use(errorHandler());
       }
-      app.get('/', (req, res) => {
-        res.redirect('/atlassian-connect.json');
-      });
 
       app.use(addon.middleware());
       (async () => {

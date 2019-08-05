@@ -64,8 +64,7 @@
             "scripts": [],
             "customWebpackConfig": {
               "path": "./webpack.config.js"
-            },
-            "baseHref": "app"
+            }
           },
           "configurations": {
             "production": {

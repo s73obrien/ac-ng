@@ -9,7 +9,28 @@ import {
   mergeWith,
   template
 } from '@angular-devkit/schematics';
-import { NodeDependency, NodeDependencyType, addPackageJsonDependency } from '@schematics/angular/utility/dependencies';
+
+import {
+  NodeDependency,
+  NodeDependencyType,
+  addPackageJsonDependency,
+} from '@schematics/angular/utility/dependencies';
+
+import {
+  findModule
+} from '@schematics/angular/utility/find-module';
+
+import {
+  addImportToModule
+} from '@schematics/angular/utility/ast-utils';
+
+import {
+  getAppModulePath
+} from '@schematics/angular/utility/ng-ast-utils';
+
+import {
+  getWorkspace
+} from '@schematics/angular/utility/workspace';
 
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { experimental, strings } from '@angular-devkit/core';
@@ -18,9 +39,10 @@ import { DEPENDENCIES } from './dependencies';
 import { pairs } from 'rxjs';
 import { map, concatMap } from 'rxjs/operators';
 import { JSDOM } from 'jsdom';
+import { createSourceFile } from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
 
 export function ngAdd(options: NgAceOptions): Rule {
-  return (tree: Tree, context: SchematicContext) => {
+  return async (tree: Tree, context: SchematicContext) => {
     const workspaceConfig = tree.read('/angular.json');
     if (!workspaceConfig) {
       throw new SchematicsException('Could not find Angular workspace configuration');
@@ -128,15 +150,6 @@ function modifyIndexHtml(baseHref: string, indexLocation: string): Rule {
       document.head.appendChild(scriptEl);
     }
 
-    // let baseHrefEl = document.head.querySelector('base[href]');
-    // if (!baseHrefEl) {
-    //   context.logger.info('New base element created');
-    //   baseHrefEl = document.createElement('base');
-    //   document.head.appendChild(baseHrefEl);
-    // }
-    // baseHrefEl.setAttribute('href', `${baseHref}`);
-    // context.logger.info(`Base href set to ${baseHref} in ${indexLocation}`);
-
     tree.overwrite(indexLocation, jsdom.serialize());
     return tree;
   };
@@ -158,5 +171,13 @@ function addPackageJsonDependencies(): Rule {
         return tree;
       })
     );
+  };
+}
+
+function addImportsToAppModule(projectMainFile: string): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    const appModulePath = getAppModulePath(tree, projectMainFile);
+    addImportToModule(, appModulePath, 'NgAceModule.forRoot()', 'ng-ace');
+
   };
 }

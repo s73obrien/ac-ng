@@ -18,8 +18,7 @@
       "installed": "/installed"
   },
   "scopes": [
-      "READ",
-      "WRITE"
+      "READ"
   ],
   "modules": {
       "generalPages": [
@@ -27,9 +26,9 @@
               "key": "hello-world-page-jira",
               "location": "system.top.navigation.bar",
               "name": {
-                  "value": "NgAce Test App"
+                  "value": "Hello World"
               },
-              "url": "/app/",
+              "url": "/",
               "conditions": [{
                   "condition": "user_is_logged_in"
               }]
@@ -40,7 +39,7 @@
               "name": {
                   "value": "Hello World"
               },
-              "url": "/app/",
+              "url": "/",
               "conditions": [{
                   "condition": "user_is_logged_in"
               }]

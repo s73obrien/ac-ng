@@ -28,7 +28,7 @@
               "name": {
                   "value": "Hello World"
               },
-              "url": "/app/",
+              "url": "/",
               "conditions": [{
                   "condition": "user_is_logged_in"
               }]
@@ -39,7 +39,7 @@
               "name": {
                   "value": "Hello World"
               },
-              "url": "/app/",
+              "url": "/",
               "conditions": [{
                   "condition": "user_is_logged_in"
               }]
