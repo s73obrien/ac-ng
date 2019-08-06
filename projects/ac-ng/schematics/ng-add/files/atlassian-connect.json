@@ -1,0 +1,52 @@
+{
+  "key": <%= `"${project}"` %>,
+  "name": "My app",
+  "description": "AcNg App",
+  "vendor": {
+      "name": "ac-ng",
+      "url": "https://github.com/s73obrien/ac-ng"
+  },
+  "baseUrl": "{{localBaseUrl}}",
+  "links": {
+      "self": "{{localBaseUrl}}/atlassian-connect.json",
+      "homepage": "{{localBaseUrl}}/atlassian-connect.json"
+  },
+  "authentication": {
+      "type": "jwt"
+  },
+  "lifecycle": {
+      "installed": "/installed"
+  },
+  "scopes": [
+      "READ"
+  ],
+  "modules": {
+      "generalPages": [
+          {
+              "key": "hello-world-page-jira",
+              "location": "system.top.navigation.bar",
+              "name": {
+                  "value": "Hello World"
+              },
+              "url": "/",
+              "conditions": [{
+                  "condition": "user_is_logged_in"
+              }]
+          },
+          {
+              "key": "hello-world-page-confluence",
+              "location": "system.header/left",
+              "name": {
+                  "value": "Hello World"
+              },
+              "url": "/",
+              "conditions": [{
+                  "condition": "user_is_logged_in"
+              }]
+          }
+      ]
+  },
+  "apiMigrations": {
+      "gdpr": true
+  }
+}

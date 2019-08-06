@@ -1,0 +1,18 @@
+{
+  "name": "ac-ng",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular-builders/custom-webpack": "^8.1.0",
+    "@angular/common": "^8.0.0",
+    "@angular/core": "^8.0.0",
+    "@atlaskit/css-reset": "^5.0.5",
+    "@atlaskit/reduced-ui-pack": "^12.0.3",
+    "atlassian-connect-express": "^3.5.1",
+    "sequelize": "^5.12.2",
+    "sqlite3": "^4.0.9"
+  },
+  "schematics": "./schematics/collection.json",
+  "devDependencies": {
+    "@types/xmldom": "^0.1.29"
+  }
+}

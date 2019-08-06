@@ -36,7 +36,7 @@ tmp.file({}, (err, path, fd) => {
         '-i',
         `"${path}"`,
         '-o',
-        `"${resolve(__dirname, 'projects/ng-ace/src/api')}"`,
+        `"${resolve(__dirname, 'projects/ac-ng/src/api')}"`,
         '-g',
         'typescript-angular'
       ]);
@@ -46,7 +46,7 @@ tmp.file({}, (err, path, fd) => {
 
 function trimIds(path) {
   o = JSON.parse(readFileSync(path));
-  o.servers[0].url = 'http://dummyserver.ng-ace';
+  o.servers[0].url = 'http://dummyserver.ac-ng';
   Object.keys(o.paths).forEach(p => {
     Object.keys(o.paths[p]).forEach(method => {
       if (o.paths[p][method]['x-atlassian-connect-scope'] == 'INACCESSIBLE') {

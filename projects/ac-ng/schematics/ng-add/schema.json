@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAcNg",
+  "title": "Schema for ac-ng schematic options",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project to convert",
+      "$default": {
+        "$source": "projectName"
+      }
+    }
+  }
+}

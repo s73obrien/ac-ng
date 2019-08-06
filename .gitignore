@@ -4,10 +4,11 @@
 /dist
 /tmp
 /out-tsc
-/projects/ng-ace/src/api
-/webpack.config.json
+/projects/ac-ng/src/api
+/webpack.config.js
 /config.json
 /credentials.json
+/credentials.json*
 
 # Only exists if Bazel was run
 /bazel-out

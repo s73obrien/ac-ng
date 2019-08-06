@@ -19,11 +19,11 @@
       "dom"
     ],
     "paths": {
-      "ng-ace": [
-        "dist/ng-ace"
+      "ac-ng": [
+        "dist/ac-ng"
       ],
-      "ng-ace/*": [
-        "dist/ng-ace/*"
+      "ac-ng/*": [
+        "dist/ac-ng/*"
       ]
     }
   }

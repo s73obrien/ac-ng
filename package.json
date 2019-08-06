@@ -1,18 +1,20 @@
 {
-  "name": "ng-ace",
+  "name": "ac-ng",
   "version": "0.0.0",
   "scripts": {
     "build": "npm run clean && npm run build:api && npm run build:lib && npm run build:schematics",
     "build:api": "node build-api.js",
-    "build:lib": "ng build ng-ace",
-    "build:schematics": "tsc -p projects/ng-ace/tsconfig.schematics.json",
-    "copy:schemas": "cpx projects/ng-ace/schematics/*/schema.json dist/ng-ace/schematics",
-    "copy:files": "cpx projects/ng-ace/schematics/*/files/** dist/ng-ace/schematics",
-    "copy:collection": "cpx projects/ng-ace/schematics/collection.json dist/ng-ace/schematics",
+    "build:lib": "ng build ac-ng",
+    "build:schematics": "tsc -p projects/ac-ng/tsconfig.schematics.json",
+    "copy:schemas": "cpx projects/ac-ng/schematics/*/schema.json dist/ac-ng/schematics",
+    "copy:files": "cpx projects/ac-ng/schematics/*/files/** dist/ac-ng/schematics",
+    "copy:collection": "cpx projects/ac-ng/schematics/collection.json dist/ac-ng/schematics",
     "postbuild": "npm run copy:schemas && npm run copy:files && npm run copy:collection",
-    "clean": "rimraf dist",
-    "unadd": "rimraf atlassian-connect.json && rimraf webpack.config.js && rimraf config.json && rimraf credentials.json",
-    "dry-run:add": "npm run unadd && npm run build && npm link dist/ng-ace && ng add ng-ace"
+    "clean": "rimraf dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/s73obrien/ac-ng"
   },
   "private": true,
   "dependencies": {
@@ -34,6 +36,7 @@
     "@angular-builders/custom-webpack": "^8.1.0",
     "@angular-devkit/build-angular": "~0.800.6",
     "@angular-devkit/build-ng-packagr": "~0.800.6",
+    "@angular/cdk": "^8.1.2",
     "@angular/cli": "~8.0.1",
     "@angular/common": "^8.0.0",
     "@angular/compiler-cli": "~8.0.0",

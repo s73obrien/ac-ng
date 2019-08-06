@@ -1,27 +1,37 @@
-# NgAce
+# Ac-Ng
+## Atlassian Connect Express (ACE) Angular Style
+This library for Angular 7.x is designed to connect your Angular application to your JIRA or Confluence instance out-of-the-box.  Under the hood, it splices the [atlassian-connect-express](https://bitbucket.org/atlassian/atlassian-connect-express/src/master/) library into your webpack-dev-server so developmental deployment is as simple as running ```ng serve``` after setting up your ```credentials.json``` file.  It also automatically inserts the [Atlassian Javascript API](https://developer.atlassian.com/cloud/jira/platform/about-the-javascript-api/) so your app can make cross-domain calls from inside its iframe.  On top of all that, this library provides a type-safe automatically-generated API service through which your app can make all necessary calls to the JIRA or Confluence instance.
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.0.1.
+### Quickstart
+On a fresh (or existing) Angular app, run
+```
+ng add ac-ng
+```
+Along with modifying your app's main module, index.html, and package.json files, this will copy several files into your project's root directory: ```webpack.config.js```, ```config.js```, ```credentials.json```, and ```atlassian-connect.json```.
 
-## Development server
+The only file you need to edit right off-the-bat is ```credentials.json```
+#### credentials.json
+```json
+{
+  "hosts": {
+    "your-instance-name.atlassian.net": {
+      "product": "jira",
+      "username": "Your username",
+      "password": "Your API Token from https://id.atlassian.com/manage/api-tokens"
+    }
+  }
+}
+```
+If you haven't already, go to https://id.atlassian.com/manage/api-tokens and register yourself a new API token, copy it and paste it into the `password` field.  You will also need to put the email address you use to access your Atlassian site in `username`.  Directly under `hosts`, change `your-instance-name.atlassian.net` to match the hostname of your instance.  Save this file.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Go to your instance's 'Manage Apps' page, click on the 'Settings' link directly underneath the 'User Installed Apps' table and enable 'Development Mode'.
 
-## Code scaffolding
+Start your Angular dev server in the normal way
+```
+ng serve
+```
+And watch for the line that states that your plugin was registered successfully.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Now, if you go to your instance's home page, you should see your shiny new plugin link right above the 'Jira Settings' link!
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Click on it and you should see your app!
