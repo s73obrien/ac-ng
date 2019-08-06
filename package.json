@@ -1,6 +1,6 @@
 {
   "name": "ac-ng",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "scripts": {
     "build": "npm run clean && npm run build:api && npm run build:lib && npm run build:schematics",
     "build:api": "node build-api.js",
