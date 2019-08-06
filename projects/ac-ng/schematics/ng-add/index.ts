@@ -7,12 +7,14 @@ import {
   url,
   chain,
   mergeWith,
-  template
+  template,
+  forEach
 } from '@angular-devkit/schematics';
 
 import {
   addModuleImportToRootModule,
   getProjectFromWorkspace,
+  getProjectStyleFile,
 } from '@angular/cdk/schematics';
 
 import {
@@ -27,14 +29,29 @@ import {
 
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { strings } from '@angular-devkit/core';
-import { Schema as NgAceOptions } from './schema';
+import { Schema as AcNgOptions } from './schema';
 import { DEPENDENCIES } from './dependencies';
 import { pairs } from 'rxjs';
 import { map, concatMap } from 'rxjs/operators';
 import { JSDOM } from 'jsdom';
+import { red, italic } from '@angular-devkit/core/src/terminal';
 
-export function ngAdd(options: NgAceOptions): Rule {
+export function ngAdd(options: AcNgOptions): Rule {
   return async (tree: Tree, context: SchematicContext) => {
+    return chain([
+      changeBuilders(options),
+      modifyIndexHtml(options),
+      addPackageJsonDependencies(),
+      copyTemplateFiles(options),
+      addImportsToAppModule(options),
+      addStylesToProject(options),
+      installDependencies(),
+    ]);
+  };
+}
+
+function changeBuilders(options: AcNgOptions): Rule {
+  return (tree: Tree, context: SchematicContext) => {
     const workspace = getWorkspace(tree);
     if (!options.project) {
       options.project = workspace.defaultProject;
@@ -66,10 +83,6 @@ export function ngAdd(options: NgAceOptions): Rule {
       }
     };
 
-    if (!build.options.index) {
-      throw new SchematicsException('Could not find index.html entry in angular.json');
-    }
-
     if (!serve) {
       throw new SchematicsException('Could not find serve command options');
     }
@@ -80,43 +93,101 @@ export function ngAdd(options: NgAceOptions): Rule {
       browserTarget: `${options.project}:build`
     };
 
+    tree.overwrite('/angular.json', JSON.stringify(workspace, undefined, 2));
+
+    return tree;
+  };
+}
+
+function addStylesToProject(options: AcNgOptions): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    const workspace = getWorkspace(tree);
+    const project = getProjectFromWorkspace(workspace, options.project);
+    const styleFilePath = getProjectStyleFile(project);
+
+    if (!styleFilePath) {
+      context.logger.warn(red(`Could not find the default style file for the project.`));
+      context.logger.warn(red(`The AtlasKit css bundles (css-reset and reduced-ui-pack) will not be included.`));
+      return;
+    }
+
+    const buffer = tree.read(styleFilePath);
+    if (!buffer) {
+      context.logger.warn(red(`Could read the default style file for the project ${italic(styleFilePath)}`));
+      context.logger.warn(red(`The AtlasKit css bundles will not be included.`));
+      return;
+    }
+
+    const content = buffer.toString();
+    const linesToInsert = `\n@import '~@atlaskit/css-reset/dist/bundle.css';\n` +
+    `@import '~@atlaskit/reduced-ui-pack/dist/bundle.css';`;
+
+    if (!content.includes(linesToInsert)) {
+      const recorder = tree.beginUpdate(styleFilePath);
+      recorder.insertLeft(content.length, linesToInsert);
+      tree.commitUpdate(recorder);
+    }
+
+    return tree;
+  };
+}
+
+function copyTemplateFiles(options: AcNgOptions): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    function skipIfExists(): Rule {
+      return forEach(entry => {
+        if (tree.exists(entry.path)) {
+          context.logger.info(`${entry.path} already exists. Skipping.`);
+          return null;
+        } else {
+          return entry;
+        }
+      });
+    }
+
     const templateSource = apply(
       url('./files'),
       [
         template({
           ...strings,
           ...options
-        })
+        }),
+        skipIfExists()
       ]
     );
 
-    tree.overwrite('/angular.json', JSON.stringify(workspace, undefined, 2));
-
-    return chain([
-      modifyIndexHtml(build.options.index),
-      addPackageJsonDependencies(),
-      installDependencies(),
-      addImportsToAppModule(options),
-      mergeWith(templateSource)
-    ]);
+    return mergeWith(templateSource);
   };
 }
 
 function installDependencies(): Rule {
   return (tree: Tree, context: SchematicContext) => {
     context.addTask(new NodePackageInstallTask());
-    context.logger.debug('Dependencies installed');
+    return tree;
   };
 }
 
-function modifyIndexHtml(indexLocation: string): Rule {
+function modifyIndexHtml(options: AcNgOptions): Rule {
   return (tree: Tree, context: SchematicContext) => {
-    if (!indexLocation) {
-      throw new SchematicsException('No index.html file found');
+    const workspace = getWorkspace(tree);
+    const project = getProjectFromWorkspace(workspace, options.project);
+    if (!project.architect) {
+      throw new SchematicsException('No architect entry found');
     }
-    const indexHtmlBuffer = tree.read(indexLocation);
+
+    if (project.projectType !== 'application') {
+      throw new SchematicsException('ac-ng is intended only for use with applications');
+    }
+
+    // tslint:disable-next-line: no-string-literal
+    const build = project.architect['build'];
+    if (!build.options.index) {
+      throw new SchematicsException('Could not find index.html entry in angular.json');
+    }
+
+    const indexHtmlBuffer = tree.read(build.options.index);
     if (!indexHtmlBuffer) {
-      throw new SchematicsException(`Could not load ${indexLocation} from disk`);
+      throw new SchematicsException(`Could not load ${build.options.index} from disk`);
     }
 
     const indexHtml = indexHtmlBuffer.toString();
@@ -136,7 +207,7 @@ function modifyIndexHtml(indexLocation: string): Rule {
       document.head.appendChild(scriptEl);
     }
 
-    tree.overwrite(indexLocation, jsdom.serialize());
+    tree.overwrite(build.options.index, jsdom.serialize());
     return tree;
   };
 }
@@ -160,7 +231,7 @@ function addPackageJsonDependencies(): Rule {
   };
 }
 
-function addImportsToAppModule(options: NgAceOptions): Rule {
+function addImportsToAppModule(options: AcNgOptions): Rule {
   return (tree: Tree, context: SchematicContext) => {
     const workspace = getWorkspace(tree);
     const project = getProjectFromWorkspace(workspace, options.project);
