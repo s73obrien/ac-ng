@@ -1,15 +1,24 @@
 {
   "name": "ac-ng",
+  "description": "Library to enable Atlassian Connect in your Angular application",
   "version": "1.0.1",
-  "peerDependencies": {
+  "license": "MIT",
+  "keywords": [
+    "angular",
+    "atlassian connect",
+    "typescript",
+    "ace",
+    "jira",
+    "confluence"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/s73obrien/ac-ng"
   },
+  "homepage": "https://github.com/s73obrien/ac-ng",
   "schematics": "./schematics/collection.json",
-  "devDependencies": {
-    "@angular-builders/custom-webpack": "^8.1.0",
-    "@atlaskit/css-reset": "^5.0.5",
-    "@atlaskit/reduced-ui-pack": "^12.0.3",
-    "atlassian-connect-express": "^3.5.1",
-    "sequelize": "^5.12.2",
-    "sqlite3": "^4.0.9"
+  "peerDependencies": {
+    "jsdom": "^15.1.1",
+    "@angular/cdk": "^8.1.2"
   }
 }
