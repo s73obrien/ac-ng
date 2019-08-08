@@ -3,7 +3,7 @@ Ac-Ng
 
 ### Atlassian Connect Express (ACE) Angular Style
 **Features**
-- Connects your Angular application to your JIRA or Confluence instance out-of-the-box
+- Connects your Angular application to your JIRA instance out-of-the-box
 - Seamlessly integrates with ```ng serve``` for a familiar development experience
 - All of the benefits of [ACE](https://bitbucket.org/atlassian/atlassian-connect-express/src/master/), including automatic insertion of the [Atlassian Javascript API](https://developer.atlassian.com/cloud/jira/platform/about-the-javascript-api/) into your app's index.html
 - Type-safe automatically-generated API service included for easy integration into your app
@@ -46,3 +46,7 @@ And watch for the line that states that your plugin was registered successfully.
 Now, if you go to your instance's home page, you should see your shiny new plugin link right above the 'Jira Settings' link!
 
 Click on it and you should see your app!
+
+### Integration With Your App
+
+ac-ng includes an ```ApiService``` that exposes the Atlassian
