@@ -1,6 +1,12 @@
-# Ac-Ng
-## Atlassian Connect Express (ACE) Angular Style
-This library for Angular 7.x is designed to connect your Angular application to your JIRA or Confluence instance out-of-the-box.  Under the hood, it splices the [atlassian-connect-express](https://bitbucket.org/atlassian/atlassian-connect-express/src/master/) library into your webpack-dev-server so developmental deployment is as simple as running ```ng serve``` after setting up your ```credentials.json``` file.  It also automatically inserts the [Atlassian Javascript API](https://developer.atlassian.com/cloud/jira/platform/about-the-javascript-api/) so your app can make cross-domain calls from inside its iframe.  On top of all that, this library provides a type-safe automatically-generated API service through which your app can make all necessary calls to the JIRA or Confluence instance.
+Ac-Ng
+-----
+
+### Atlassian Connect Express (ACE) Angular Style
+**Features**
+- Connects your Angular application to your JIRA or Confluence instance out-of-the-box
+- Seamlessly integrates with ```ng serve``` for a familiar development experience
+- All of the benefits of [ACE](https://bitbucket.org/atlassian/atlassian-connect-express/src/master/), including automatic insertion of the [Atlassian Javascript API](https://developer.atlassian.com/cloud/jira/platform/about-the-javascript-api/) into your app's index.html
+- Type-safe automatically-generated API service included for easy integration into your app
 
 ### Quickstart
 Install prerequisites:
