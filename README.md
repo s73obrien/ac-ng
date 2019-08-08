@@ -8,7 +8,7 @@ Ac-Ng
 - All of the benefits of [ACE](https://bitbucket.org/atlassian/atlassian-connect-express/src/master/), including automatic insertion of the [Atlassian Javascript API](https://developer.atlassian.com/cloud/jira/platform/about-the-javascript-api/) into your app's index.html
 - Type-safe automatically-generated API service included for easy integration into your app
 
-### Quickstart
+## Quickstart
 Install prerequisites:
 ```
 npm i jsdom @angular/cdk
@@ -18,10 +18,10 @@ On a fresh (or existing) Angular app, run
 ```
 ng add ac-ng
 ```
-Along with modifying your app's main module, index.html, and package.json files, this will copy several files into your project's root directory: ```webpack.config.js```, ```config.js```, ```credentials.json```, and ```atlassian-connect.json```.
+Along with modifying your app's main module, index.html, and package.json files, this will copy several files into your project's root directory: `webpack.config.js`, `config.js`, `credentials.json`, and `atlassian-connect.json`.
 
-The only file you need to edit right off-the-bat is ```credentials.json```
-#### credentials.json
+The only file you need to edit right off-the-bat is `credentials.json`
+credentials.json:
 ```json
 {
   "hosts": {
@@ -47,6 +47,37 @@ Now, if you go to your instance's home page, you should see your shiny new plugi
 
 Click on it and you should see your app!
 
-### Integration With Your App
+## Integration With Your App
 
-ac-ng includes an ```ApiService``` that exposes the Atlassian
+ac-ng includes api services that expose the [Jira Cloud platform REST API](https://developer.atlassian.com/cloud/jira/platform/rest/v2/) to your application.
+
+### Example
+app.component.ts:
+```typescript
+import { Component } from '@angular/core';
+import { ProjectsService } from 'ac-ng';
+import { map } from 'rxjs/operators';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  projectNames = this.projectsService
+  .searchProjects()
+  .pipe(
+    map(({values}) => {
+      return values.map(project => project.name);
+    })
+  );
+
+  constructor(public projectsService: ProjectsService) {}
+}
+```
+app.component.html:
+```html
+<div ngFor='let name of projectNames | async'>
+  {{{name}}}
+</div>
+```
