@@ -6,6 +6,7 @@ const { fork } = require('child_process');
 const { resolve } = require('path');
 const tmp = require('tmp');
 const https = require('https');
+const { unlinkSync } = require('fs');
 
 tmp.file({}, (err, path, fd) => {
   const proxyInfo = process.env.http_proxy ||
@@ -28,7 +29,7 @@ tmp.file({}, (err, path, fd) => {
       file.close();
       trimIds(path);
       patchSpec(path);
-      fork('node_modules/@openapitools/openapi-generator-cli/bin/openapi-generator', [
+      const gen = fork('node_modules/@openapitools/openapi-generator-cli/bin/openapi-generator', [
         'generate',
         '--skip-validate-spec',
         '--remove-operation-id-prefix',
@@ -41,6 +42,14 @@ tmp.file({}, (err, path, fd) => {
         '-g',
         'typescript-angular'
       ]);
+
+      gen.on('exit', (code) => {
+        if (code === 0) {
+          //try {
+            unlinkSync('./projects/ac-ng/src/api/index.ts');
+          //} catch (error) {}
+        }
+      })
     });
   });
 });
