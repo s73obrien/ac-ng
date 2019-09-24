@@ -27,6 +27,7 @@ tmp.file({}, (err, path, fd) => {
     file.on('finish', () => {
       file.close();
       trimIds(path);
+      patchSpec(path);
       fork('node_modules/@openapitools/openapi-generator-cli/bin/openapi-generator', [
         'generate',
         '--skip-validate-spec',
@@ -61,6 +62,16 @@ function trimIds(path) {
       }
     })
   })
+
+  writeFileSync(path, JSON.stringify(o));
+}
+
+function patchSpec(path) {
+  o = JSON.parse(readFileSync(path));
+  // Remove the null value from the enumeration and set the type to nullable on
+  // FieldValueClause.operator
+  o.components.schemas.FieldValueClause.properties.operator.nullable = true;
+  o.components.schemas.FieldValueClause.properties.operator.enum = o.components.schemas.FieldValueClause.properties.operator.enum.filter(x => x);
 
   writeFileSync(path, JSON.stringify(o));
 }
