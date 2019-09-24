@@ -27,8 +27,8 @@ tmp.file({}, (err, path, fd) => {
     console.log(path);
     file.on('finish', () => {
       file.close();
-      trimIds(path);
       patchSpec(path);
+      trimIds(path);
       const gen = fork('node_modules/@openapitools/openapi-generator-cli/bin/openapi-generator', [
         'generate',
         '--skip-validate-spec',
@@ -45,9 +45,9 @@ tmp.file({}, (err, path, fd) => {
 
       gen.on('exit', (code) => {
         if (code === 0) {
-          //try {
+          try {
             unlinkSync('./projects/ac-ng/src/api/index.ts');
-          //} catch (error) {}
+          } catch (error) {}
         }
       })
     });
@@ -77,10 +77,10 @@ function trimIds(path) {
 
 function patchSpec(path) {
   o = JSON.parse(readFileSync(path));
-  // Remove the null value from the enumeration and set the type to nullable on
-  // FieldValueClause.operator
+  // Remove the null value and the inversion of equality symbol (~=) from the
+  // enumeration and set the type to nullable on FieldValueClause.operator
   o.components.schemas.FieldValueClause.properties.operator.nullable = true;
-  o.components.schemas.FieldValueClause.properties.operator.enum = o.components.schemas.FieldValueClause.properties.operator.enum.filter(x => x);
-
+  o.components.schemas.FieldValueClause.properties.operator.enum = o.components.schemas.FieldValueClause.properties.operator.enum.filter(x => x && x !== '~=');
+  writeFileSync('./after.json', JSON.stringify(o, null, 2));
   writeFileSync(path, JSON.stringify(o));
 }

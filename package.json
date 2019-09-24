@@ -38,7 +38,7 @@
     "@angular/compiler": "^8.0.3",
     "@angular/compiler-cli": "^8.0.3",
     "@angular/core": "^8.0.3",
-    "@openapitools/openapi-generator-cli": "0.0.16-4.0.3",
+    "@openapitools/openapi-generator-cli": "0.0.19-4.1.2",
     "@types/jasmine": "^3.3.16",
     "@types/jsdom": "^12.2.4",
     "@types/node": "^12.6.9",
