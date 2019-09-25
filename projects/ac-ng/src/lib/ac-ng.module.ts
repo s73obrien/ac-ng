@@ -1,10 +1,10 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import AcNgJavascriptApiInterceptor from './ac-ng-javascript-api.interceptor';
-import { ApiModule } from '../api';
+import { AcNgJavascriptApiInterceptor } from './ac-ng-javascript-api.interceptor';
+import { ApiModule } from '../api/api.module';
 
 @NgModule({
-  imports: [ApiModule],
+  //imports: [ApiModule],
   exports: [ApiModule]
 })
 export class AcNgModule {
@@ -12,7 +12,7 @@ export class AcNgModule {
     return {
       ngModule: AcNgModule,
       providers: [
-        ApiModule,
+        // ApiModule,
         { provide: HTTP_INTERCEPTORS, useClass: AcNgJavascriptApiInterceptor, multi: true }
       ]
     };

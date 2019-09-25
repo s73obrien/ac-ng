@@ -6,6 +6,7 @@ const { fork } = require('child_process');
 const { resolve } = require('path');
 const tmp = require('tmp');
 const https = require('https');
+const { unlinkSync } = require('fs');
 
 tmp.file({}, (err, path, fd) => {
   const proxyInfo = process.env.http_proxy ||
@@ -26,8 +27,9 @@ tmp.file({}, (err, path, fd) => {
     console.log(path);
     file.on('finish', () => {
       file.close();
+      patchSpec(path);
       trimIds(path);
-      fork('node_modules/@openapitools/openapi-generator-cli/bin/openapi-generator', [
+      const gen = fork('node_modules/@openapitools/openapi-generator-cli/bin/openapi-generator', [
         'generate',
         '--skip-validate-spec',
         '--remove-operation-id-prefix',
@@ -40,6 +42,14 @@ tmp.file({}, (err, path, fd) => {
         '-g',
         'typescript-angular'
       ]);
+
+      gen.on('exit', (code) => {
+        if (code === 0) {
+          try {
+            unlinkSync('./projects/ac-ng/src/api/index.ts');
+          } catch (error) {}
+        }
+      })
     });
   });
 });
@@ -62,5 +72,14 @@ function trimIds(path) {
     })
   })
 
+  writeFileSync(path, JSON.stringify(o));
+}
+
+function patchSpec(path) {
+  o = JSON.parse(readFileSync(path));
+  // Remove the null value and the inversion of equality symbol (~=) from the
+  // enumeration and set the type to nullable on FieldValueClause.operator
+  o.components.schemas.FieldValueClause.properties.operator.nullable = true;
+  o.components.schemas.FieldValueClause.properties.operator.enum = o.components.schemas.FieldValueClause.properties.operator.enum.filter(x => x && x !== '~=');
   writeFileSync(path, JSON.stringify(o));
 }

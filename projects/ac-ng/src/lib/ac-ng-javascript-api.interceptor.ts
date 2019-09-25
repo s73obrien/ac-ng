@@ -4,21 +4,10 @@ import { Observable, from } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { parse } from 'url';
 
-const zoneAware = (zone: NgZone) => <T>(source: Observable<T>) =>
-  new Observable<T>(observer => {
-    return source.subscribe({
-      next(x) {
-        zone.run(() => observer.next(x));
-      },
-      error(err) { observer.error(err); },
-      complete() { observer.complete(); }
-    });
-  });
-
 @Injectable({
   providedIn: 'root'
 })
-export default class AcNgJavascriptApiInterceptor implements HttpInterceptor {
+export class AcNgJavascriptApiInterceptor implements HttpInterceptor {
   constructor(private zone: NgZone) { }
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (req.url.includes('http://dummyserver.ac-ng')) {
@@ -39,10 +28,23 @@ export default class AcNgJavascriptApiInterceptor implements HttpInterceptor {
           status: e.xhr.status,
           statusText: e.xhr.statusText
         })),
-        zoneAware(this.zone)
+        this.zoneAware(this.zone)
       );
     } else {
       return next.handle(req);
     }
+  }
+
+  private zoneAware(zone: NgZone) {
+    return <T>(source: Observable<T>) =>
+      new Observable<T>(observer => {
+        return source.subscribe({
+          next(x) {
+            zone.run(() => observer.next(x));
+          },
+          error(err) { observer.error(err); },
+          complete() { observer.complete(); }
+        });
+      });
   }
 }

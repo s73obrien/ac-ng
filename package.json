@@ -20,6 +20,7 @@
     "copy:collection": "cpx projects/ac-ng/schematics/collection.json dist/ac-ng/schematics",
     "copy:license": "cpx LICENSE dist/ac-ng",
     "copy:readme": "cpx README.md dist/ac-ng",
+    "deploy:local": "cd dist/ac-ng && npm link",
     "postbuild": "npm run copy:license && npm run copy:readme && npm run copy:schemas && npm run copy:files && npm run copy:collection",
     "clean": "rimraf dist"
   },
