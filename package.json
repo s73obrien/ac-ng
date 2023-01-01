@@ -31,7 +31,7 @@
   "private": true,
   "dependencies": {},
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.800.6",
+    "@angular-devkit/build-angular": "^15.0.4",
     "@angular-devkit/build-ng-packagr": "^0.800.6",
     "@angular/cdk": "^8.1.2",
     "@angular/cli": "^8.0.6",
